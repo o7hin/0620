@@ -1,0 +1,851 @@
+/* 全域設定 */
+:root {
+    --primary-color: #ff6b6b;
+    --secondary-color: #4ecdc4;
+    --accent-color: #ffe66d;
+    --dark-color: #2d3436;
+    --light-color: #f8f9fa;
+    --easy-color: #f8f9fa;     /* 白色 - 簡單難度 */
+    --medium-color: #4ecdc4;   /* 綠色 - 中等難度 */
+    --hard-color: #ff6b6b;     /* 紅色 - 困難難度 */
+    --box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    --border-radius: 8px;
+    --transition: all 0.3s ease;
+}
+
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    font-family: 'Segoe UI', 'Microsoft JhengHei', sans-serif;
+    line-height: 1.6;
+    color: var(--dark-color);
+    background: #f5f7fa;
+}
+
+.container {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 20px;
+}
+
+/* 標題區塊 */
+header {
+    text-align: center;
+    margin-bottom: 30px;
+    padding: 20px;
+    background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+    border-radius: var(--border-radius);
+    box-shadow: var(--box-shadow);
+    color: white;
+}
+
+header h1 {
+    font-size: 2.5rem;
+    margin-bottom: 10px;
+}
+
+/* 主內容區塊 */
+section {
+    margin-bottom: 30px;
+    background: white;
+    padding: 20px;
+    border-radius: var(--border-radius);
+    box-shadow: var(--box-shadow);
+}
+
+/* 語音輸入區塊 */
+.voice-input-section {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 20px;
+    align-items: center;
+}
+
+.voice-control {
+    flex: 1;
+    min-width: 250px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+}
+
+.voice-control button {
+    width: 180px;
+    text-align: center;
+}
+
+.voice-result {
+    flex: 2;
+    min-width: 300px;
+}
+
+.voice-text-display {
+    min-height: 100px;
+    padding: 15px;
+    background-color: var(--light-color);
+    border: 1px solid #ddd;
+    border-radius: var(--border-radius);
+    margin-top: 10px;
+}
+
+.status-indicator {
+    margin-top: 15px;
+    padding: 8px 16px;
+    background: var(--light-color);
+    border-radius: 20px;
+    font-size: 0.9rem;
+    transition: var(--transition);
+}
+
+.status-indicator.listening {
+    background: var(--secondary-color);
+    color: white;
+    animation: pulse 1.5s infinite;
+}
+
+.status-indicator.connected {
+    background: #4caf50;
+    color: white;
+}
+
+@keyframes pulse {
+    0% {
+        opacity: 1;
+    }
+    50% {
+        opacity: 0.7;
+    }
+    100% {
+        opacity: 1;
+    }
+}
+
+/* 按鈕樣式 */
+.btn {
+    padding: 10px 20px;
+    border: none;
+    border-radius: 50px;
+    background-color: var(--primary-color);
+    color: white;
+    font-size: 1rem;
+    cursor: pointer;
+    transition: var(--transition);
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.btn:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 12px rgba(0, 0, 0, 0.15);
+}
+
+.btn-primary {
+    background-color: var(--primary-color);
+    font-size: 1.1rem;
+    padding: 12px 24px;
+}
+
+.btn-confirm {
+    background-color: var(--secondary-color);
+    margin-top: 15px;
+    width: 100%;
+}
+
+.btn-secondary {
+    background-color: var(--secondary-color);
+    padding: 10px 20px;
+}
+
+.btn-danger {
+    background-color: #f44336;
+    color: white;
+}
+
+.btn-danger:hover {
+    background-color: #d32f2f;
+}
+
+/* 輸入區塊 */
+.input-section {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+    gap: 20px;
+}
+
+.input-group {
+    display: flex;
+    flex-direction: column;
+}
+
+.input-group h3 {
+    margin-bottom: 10px;
+    color: var(--dark-color);
+}
+
+input[type="text"],
+input[type="number"] {
+    padding: 12px;
+    border: 1px solid #ddd;
+    border-radius: var(--border-radius);
+    font-size: 1rem;
+}
+
+/* 難度按鈕區塊 */
+.difficulty-section h3,
+.arduino-section h3 {
+    margin-bottom: 15px;
+}
+
+.difficulty-buttons {
+    display: flex;
+    justify-content: space-between;
+    gap: 15px;
+}
+
+.difficulty-btn {
+    flex: 1;
+    padding: 15px;
+    border: none;
+    border-radius: var(--border-radius);
+    font-size: 1rem;
+    cursor: pointer;
+    transition: var(--transition);
+    color: white;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 8px;
+}
+
+.difficulty-icon {
+    font-size: 1.5rem;
+}
+
+.difficulty-btn.easy {
+    background-color: var(--easy-color);
+    color: #2d3436; /* 深色文字以提高對比度 */
+    border: 2px solid #dee2e6; /* 添加邊框使白色按鈕更明顯 */
+}
+
+.difficulty-btn.medium {
+    background-color: var(--medium-color);
+}
+
+.difficulty-btn.hard {
+    background-color: var(--hard-color);
+}
+
+.difficulty-btn:hover,
+.difficulty-btn.active {
+    transform: translateY(-3px);
+    box-shadow: 0 6px 12px rgba(0, 0, 0, 0.15);
+}
+
+/* 標籤頁樣式 */
+.tabs {
+    display: flex;
+    margin-bottom: 20px;
+    border-bottom: 2px solid #eee;
+}
+
+.tab-btn {
+    padding: 10px 20px;
+    background: none;
+    border: none;
+    font-size: 1.1rem;
+    cursor: pointer;
+    transition: var(--transition);
+    position: relative;
+}
+
+.tab-btn.active {
+    color: var(--primary-color);
+}
+
+.tab-btn.active::after {
+    content: '';
+    position: absolute;
+    bottom: -2px;
+    left: 0;
+    width: 100%;
+    height: 2px;
+    background-color: var(--primary-color);
+}
+
+.tab-content {
+    display: none;
+}
+
+.tab-content.active {
+    display: block;
+}
+
+/* 食譜卡片樣式 */
+.recipe-card,
+.cocktail-card {
+    border: 1px solid #eee;
+    border-radius: var(--border-radius);
+    overflow: hidden;
+}
+
+.recipe-card h2,
+.cocktail-card h2 {
+    padding: 15px;
+    background-color: var(--secondary-color);
+    color: white;
+    text-align: center;
+}
+
+.recipe-info,
+.cocktail-info {
+    padding: 20px;
+}
+
+.recipe-detail,
+.cocktail-detail {
+    margin-bottom: 20px;
+}
+
+.recipe-detail h4,
+.cocktail-detail h4 {
+    margin-bottom: 10px;
+    color: var(--primary-color);
+}
+
+.recipe-detail ul,
+.recipe-detail ol,
+.cocktail-detail ul,
+.cocktail-detail ol {
+    padding-left: 20px;
+}
+
+.recipe-detail li,
+.cocktail-detail li {
+    margin-bottom: 5px;
+}
+
+.recipe-stats,
+.cocktail-stats {
+    display: flex;
+    justify-content: space-around;
+    margin-top: 20px;
+    background-color: var(--light-color);
+    padding: 10px;
+    border-radius: var(--border-radius);
+}
+
+.stat {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 5px;
+}
+
+.stat-label {
+    font-size: 0.9rem;
+    color: #666;
+}
+
+.stat-value {
+    font-weight: bold;
+    font-size: 1.1rem;
+}
+
+/* Arduino 連接區塊 */
+.arduino-section {
+    margin-bottom: 30px;
+}
+
+.arduino-controls {
+    display: flex;
+    align-items: center;
+    gap: 20px;
+    margin-bottom: 15px;
+}
+
+.arduino-actions {
+    display: flex;
+    justify-content: center;
+}
+
+#arduinoStatus {
+    padding: 8px 16px;
+    background: var(--light-color);
+    border-radius: 20px;
+    font-size: 0.9rem;
+}
+
+/* 禁用按鈕樣式 */
+button:disabled {
+    background-color: #cccccc;
+    cursor: not-allowed;
+    opacity: 0.7;
+}
+
+button:disabled:hover {
+    transform: none;
+    box-shadow: none;
+}
+
+/* 頁尾樣式 */
+footer {
+    text-align: center;
+    margin-top: 40px;
+    padding: 20px;
+    color: #666;
+}
+
+/* 通知樣式 */
+.notification {
+    position: fixed;
+    top: 20px;
+    right: 20px;
+    padding: 15px 20px;
+    border-radius: var(--border-radius);
+    background-color: white;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+    z-index: 1000;
+    max-width: 300px;
+    transform: translateX(120%);
+    transition: transform 0.3s ease-in-out;
+}
+
+.notification.show {
+    transform: translateX(0);
+}
+
+.notification-content {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 10px;
+}
+
+.notification-close {
+    background: none;
+    border: none;
+    font-size: 1.2rem;
+    cursor: pointer;
+    color: #666;
+}
+
+.notification.info {
+    border-left: 4px solid var(--secondary-color);
+}
+
+.notification.success {
+    border-left: 4px solid #4caf50;
+}
+
+.notification.warning {
+    border-left: 4px solid #ff9800;
+}
+
+.notification.error {
+    border-left: 4px solid #f44336;
+}
+
+/* 語音識別結果預覽樣式 */
+.voice-example {
+    padding: 12px;
+    background-color: #f7f9fc;
+    border-left: 3px solid var(--secondary-color);
+    border-radius: 4px;
+}
+
+.voice-example .example-text {
+    font-style: italic;
+    color: #555;
+    margin: 8px 0;
+}
+
+.voice-example .hint {
+    color: #777;
+    font-size: 0.9rem;
+    margin-top: 8px;
+}
+
+.recognized-text {
+    font-size: 1.1rem;
+    line-height: 1.5;
+    margin-bottom: 10px;
+}
+
+.processing-hint {
+    color: #777;
+    font-size: 0.9rem;
+    margin-bottom: 15px;
+}
+
+.preview-results {
+    background-color: #f0f8ff;
+    border-left: 4px solid var(--primary-color);
+    padding: 10px 15px;
+    margin-top: 15px;
+    border-radius: 4px;
+}
+
+.preview-results p {
+    margin: 6px 0;
+    font-size: 0.95rem;
+}
+
+/* 完成解析的結果樣式 */
+.voice-result-summary {
+    background-color: #f0fff0;
+    border-radius: 6px;
+    padding: 12px 15px;
+    margin-top: 15px;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+}
+
+.voice-result-summary p {
+    margin: 8px 0;
+    line-height: 1.4;
+}
+
+.result-item-success {
+    color: #2c7c2c;
+    font-weight: 500;
+}
+
+.result-item-missing {
+    color: #cc6600;
+    font-weight: 500;
+}
+
+/* 購買清單樣式 */
+.shopping-list-section {
+    margin-bottom: 20px;
+    padding: 15px;
+    background-color: #f9fff0;
+    border-radius: 8px;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+    border-left: 4px solid #4CAF50;
+}
+
+.shopping-list-section h3 {
+    margin-top: 0;
+    color: #2e7d32;
+    font-size: 1.3rem;
+    margin-bottom: 10px;
+    display: flex;
+    align-items: center;
+}
+
+.shopping-list-section h3::before {
+    content: "🛒";
+    margin-right: 8px;
+    font-size: 1.4rem;
+}
+
+.shopping-list-container {
+    padding: 0 10px;
+}
+
+#shoppingList {
+    list-style-type: none;
+    padding-left: 5px;
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+    grid-gap: 8px;
+}
+
+#shoppingList li {
+    background-color: #ffffff;
+    padding: 8px 12px;
+    border-radius: 4px;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+    display: flex;
+    align-items: center;
+    font-size: 0.95rem;
+}
+
+#shoppingList li::before {
+    content: "✓";
+    margin-right: 8px;
+    color: #4CAF50;
+    font-weight: bold;
+}
+
+#shoppingList li.purchased {
+    text-decoration: line-through;
+    opacity: 0.7;
+}
+
+#shoppingList li:hover {
+    background-color: #f0f8f0;
+    cursor: pointer;
+}
+
+/* 調整食譜詳細信息的樣式 */
+.recipe-info {
+    margin-top: 20px;
+    border-top: 1px dashed #ddd;
+    padding-top: 20px;
+}
+
+/* 標籤樣式 */
+.recipe-tags {
+    margin: 5px 0 15px 0;
+}
+
+.recipe-tag-title {
+    font-size: 0.9rem;
+    font-weight: bold;
+    margin-bottom: 5px;
+}
+
+/* 增加食物需求樣式 */
+.recipe-requirements {
+    font-size: 0.95rem;
+    margin-bottom: 8px;
+    color: #444;
+    background-color: #f5f5f5;
+    padding: 8px 12px;
+    border-radius: 6px;
+    border-left: 3px solid var(--primary-color);
+}
+
+.requirement-tag {
+    background-color: #ffecec;
+    color: var(--primary-color);
+    padding: 3px 8px;
+    border-radius: 12px;
+    font-weight: 500;
+    display: inline-block;
+    margin: 0 2px;
+    font-size: 0.9rem;
+    border: 1px solid #ffd1d1;
+}
+
+/* 匹配的標籤強調 */
+.matched-tag {
+    background-color: #fff0e0;
+    color: #ff8c00;
+    padding: 2px 6px;
+    border-radius: 4px;
+    font-weight: 500;
+    display: inline-block;
+    margin: 0 2px;
+    position: relative;
+}
+
+.matched-tag::after {
+    content: "✓";
+    font-size: 0.75em;
+    position: relative;
+    top: -2px;
+    margin-left: 3px;
+    color: #4CAF50;
+}
+
+/* 食物需求匹配標記樣式 */
+.requirements-matched {
+    background-color: #e8f5e9;
+    color: #2e7d32;
+    padding: 3px 10px;
+    border-radius: 15px;
+    font-weight: 500;
+    margin-left: 8px;
+    font-size: 0.85rem;
+    border: 1px solid #a5d6a7;
+    display: inline-block;
+}
+
+.recipe-name-container {
+    position: relative;
+}
+
+.recipe-based-on-requirements {
+    position: absolute;
+    top: -15px;
+    right: 0;
+    background-color: #ff6b6b;
+    color: white;
+    font-size: 0.75rem;
+    padding: 2px 8px;
+    border-radius: 10px;
+}
+
+/* 響應式設計 */
+@media (max-width: 768px) {
+    .difficulty-buttons {
+        flex-direction: column;
+    }
+    
+    .input-section {
+        grid-template-columns: 1fr;
+    }
+    
+    .recipe-stats,
+    .cocktail-stats {
+        flex-direction: column;
+        gap: 10px;
+    }
+}
+
+/* Arduino 控制相關樣式 */
+.arduino-control {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: white;
+    padding: 20px;
+    border-radius: 15px;
+    margin: 20px 0;
+    box-shadow: 0 4px 15px rgba(102, 126, 234, 0.3);
+    border: 2px solid rgba(255, 255, 255, 0.1);
+}
+
+.arduino-control h3 {
+    margin: 0 0 15px 0;
+    font-size: 1.4em;
+    text-align: center;
+    text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+}
+
+.arduino-buttons {
+    display: flex;
+    gap: 15px;
+    justify-content: center;
+    margin: 15px 0;
+}
+
+.arduino-btn {
+    background: linear-gradient(45deg, #ff6b6b, #ee5a52);
+    color: white;
+    border: none;
+    padding: 12px 20px;
+    border-radius: 8px;
+    cursor: pointer;
+    font-size: 14px;
+    font-weight: 600;
+    transition: all 0.3s ease;
+    box-shadow: 0 3px 10px rgba(255, 107, 107, 0.3);
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+.arduino-btn:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 5px 15px rgba(255, 107, 107, 0.4);
+    background: linear-gradient(45deg, #ff5252, #d32f2f);
+}
+
+.arduino-btn:active {
+    transform: translateY(0);
+    box-shadow: 0 2px 8px rgba(255, 107, 107, 0.3);
+}
+
+.arduino-btn:disabled {
+    background: #666;
+    cursor: not-allowed;
+    transform: none;
+    box-shadow: none;
+}
+
+.arduino-status {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin: 10px 0;
+    padding: 10px;
+    border-radius: 8px;
+    background: rgba(255, 255, 255, 0.1);
+    backdrop-filter: blur(10px);
+}
+
+.arduino-status .status-indicator {
+    width: 12px;
+    height: 12px;
+    border-radius: 50%;
+    margin-right: 8px;
+    animation: pulse 2s infinite;
+}
+
+.arduino-status.connected .status-indicator {
+    background: #4caf50;
+}
+
+.arduino-status.disconnected .status-indicator {
+    background: #f44336;
+}
+
+.arduino-status.connecting .status-indicator {
+    background: #ff9800;
+}
+
+@keyframes pulse {
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0.5; }
+}
+
+.arduino-info {
+    background: rgba(255, 255, 255, 0.1);
+    padding: 15px;
+    border-radius: 10px;
+    margin: 15px 0;
+    font-size: 14px;
+    line-height: 1.6;
+    backdrop-filter: blur(10px);
+}
+
+.arduino-info strong {
+    color: #ffeb3b;
+    text-shadow: 0 1px 2px rgba(0, 0, 0, 0.3);
+}
+
+.difficulty-explanation {
+    background: rgba(255, 255, 255, 0.1);
+    padding: 15px;
+    border-radius: 10px;
+    margin: 15px 0;
+    backdrop-filter: blur(10px);
+}
+
+.difficulty-explanation h4 {
+    margin: 0 0 10px 0;
+    color: #ffeb3b;
+    font-size: 1.1em;
+    text-shadow: 0 1px 2px rgba(0, 0, 0, 0.3);
+}
+
+.difficulty-explanation ul {
+    margin: 10px 0;
+    padding-left: 20px;
+}
+
+.difficulty-explanation li {
+    margin: 5px 0;
+    line-height: 1.4;
+}
+
+/* 響應式設計 - Arduino控制 */
+@media (max-width: 768px) {
+    .arduino-control {
+        margin: 15px 0;
+        padding: 15px;
+    }
+    
+    .arduino-buttons {
+        flex-direction: column;
+        gap: 10px;
+    }
+    
+    .arduino-btn {
+        padding: 10px 15px;
+        font-size: 13px;
+    }
+    
+    .arduino-info,
+    .difficulty-explanation {
+        padding: 12px;
+        font-size: 13px;
+    }
+}

@@ -1,0 +1,526 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AI 智慧食譜與創意調酒系統</title>
+    <link rel="stylesheet" href="css/style.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>🍳 AI 智慧食譜與調酒系統</h1>
+            <p>透過輸入食材、預算與熱量，獲得個人化食譜與調酒推薦</p>
+        </header>
+
+        <main>
+            <!-- Google API 設定區域 -->
+            <section class="api-settings-section" style="border: 2px solid #e3f2fd; border-radius: 10px; padding: 15px; margin: 20px 0; background-color: #f8f9fa;">
+                <h3 style="color: #1976D2; margin-top: 0;">🔑 Google API 設定</h3>
+                <div class="api-controls" style="display: flex; align-items: center; gap: 15px;">
+                    <button id="setApiKeyBtn" class="btn" style="background-color: #2196F3; color: white; padding: 12px 20px; border: none; border-radius: 4px; font-size: 16px; cursor: pointer; font-weight: bold; box-shadow: 0 2px 5px rgba(0,0,0,0.2);">
+                        <i class="fas fa-key"></i> 設定 Google API Key
+                    </button>
+                    <div id="apiKeyStatus" class="status-indicator" style="padding: 6px 12px; border-radius: 20px; background-color: #f1f1f1; font-weight: bold;">未設定</div>
+                </div>
+                <p class="api-info" style="margin-top: 10px; color: #666; font-style: italic;"><small>設定 Google API Key 以獲取更個性化的食譜和調酒建議</small></p>
+            </section>
+            
+            <!-- Arduino 連接區域 -->
+            <section class="arduino-section" style="border: 2px solid #fff3cd; border-radius: 10px; padding: 15px; margin: 20px 0; background-color: #fefefe;">
+                <h3 style="color: #e67e22; margin-top: 0;">🎛️ Arduino 連接</h3>
+                <div class="arduino-controls">
+                    <button id="connectArduinoBtn" class="btn btn-secondary">
+                        <i class="fas fa-plug"></i> 連接 Arduino 裝置
+                    </button>
+                    <div id="arduinoStatus" class="status-indicator">未連接</div>
+                </div>
+                <div class="arduino-actions">
+                    <button id="sendToArduinoBtn" class="btn btn-secondary" disabled>
+                        <i class="fas fa-paper-plane"></i> 傳送至 Arduino
+                    </button>
+                    <button id="testLightsBtn" class="btn btn-secondary" disabled>
+                        <i class="fas fa-lightbulb"></i> 測試燈泡
+                    </button>
+                    <button id="resetLightsBtn" class="btn btn-secondary" disabled>
+                        <i class="fas fa-power-off"></i> 重置燈泡
+                    </button>
+                </div>
+                <p style="margin-top: 10px; color: #666; font-style: italic;"><small>連接 Arduino 使用按鈕控制難度選擇，LED 燈會顯示當前難度狀態</small></p>
+            </section>
+            
+            <!-- 主要功能輸入區域 -->
+            <section class="input-section">
+                <div class="input-group">
+                    <h3>食物需求</h3>
+                    <input type="text" id="foodRequirementsInput" placeholder="例如：雞肉、蔬菜、中式料理、不要太辣、家常菜...">
+                </div>
+                <div class="input-group">
+                    <h3>預算</h3>
+                    <input type="number" id="budgetInput" placeholder="例如：200元">
+                </div>
+                <div class="input-group">
+                    <h3>熱量上限</h3>
+                    <input type="number" id="caloriesInput" placeholder="例如：500大卡">
+                </div>
+                <input type="hidden" id="ingredientsInput">
+            </section>
+
+            <!-- 難度選擇區域 -->
+            <section class="difficulty-section">
+                <h3>選擇難度 - Arduino 按鈕控制</h3>
+                <p style="color: #666; margin-bottom: 15px; font-size: 14px;">🎛️ 使用Arduino上的按鈕選擇烹飪難度，或點擊下方按鈕（需先連接Arduino）</p>
+                <div class="difficulty-buttons">
+                    <button id="easyBtn" class="difficulty-btn easy">簡單 <span class="difficulty-icon">⚪</span></button>
+                    <button id="mediumBtn" class="difficulty-btn medium">中等 <span class="difficulty-icon">🟢</span></button>
+                    <button id="hardBtn" class="difficulty-btn hard">困難 <span class="difficulty-icon">🔴</span></button>
+                </div>
+                <div class="arduino-difficulty-info" style="background-color: #fff3cd; border: 1px solid #ffeaa7; border-radius: 5px; padding: 10px; margin: 10px 0; font-size: 14px;">
+                    <p style="margin: 0; color: #856404;"><strong>💡 Arduino控制說明：</strong></p>
+                    <ul style="margin: 5px 0; padding-left: 20px; color: #856404;">
+                        <li>按下Arduino上的切換按鈕來循環選擇難度</li>
+                        <li>LED燈會點亮顯示當前選擇的難度</li>
+                        <li>網頁按鈕僅作為狀態顯示，主要由Arduino控制</li>
+                    </ul>
+                </div>
+                <button id="confirmBtn" class="btn btn-confirm">🍳 生成食譜</button>
+                <button onclick="window.debugInputs()" style="margin-left: 10px; padding: 8px 16px; background: #6c757d; color: white; border: none; border-radius: 4px; cursor: pointer;">🔍 調試輸入</button>
+                <button onclick="window.testRecipeGeneration()" style="margin-left: 10px; padding: 8px 16px; background: #28a745; color: white; border: none; border-radius: 4px; cursor: pointer;">🧪 測試生成</button>
+                <button onclick="window.diagnoseDifficultySync()" style="margin-left: 10px; padding: 8px 16px; background: #17a2b8; color: white; border: none; border-radius: 4px; cursor: pointer;">🔧 診斷難度同步</button>
+                <button onclick="window.createDifficultyDebugger()" style="margin-left: 10px; padding: 8px 16px; background: #6f42c1; color: white; border: none; border-radius: 4px; cursor: pointer;">🛠️ 開啟調試面板</button>
+            </section>
+            
+            <!-- 顯示區域 -->
+            <section class="display-section">
+                <p style="color: #666; margin-bottom: 15px; font-size: 14px; text-align: center;">點擊下方標籤來切換食譜建議或生成調酒配方</p>
+                <div class="tabs">
+                    <button id="recipeTabBtn" class="tab-btn active">🍳 食譜建議</button>
+                    <button id="cocktailTabBtn" class="tab-btn">🍹 便利商店調酒</button>
+                </div>
+                
+                <div id="recipeContent" class="tab-content active">
+                    <div class="recipe-card">
+                        <h2 id="recipeName">尚未生成食譜</h2>
+                        <div class="shopping-list-section">
+                            <h3>購買清單</h3>
+                            <div class="shopping-list-container">
+                                <ul id="shoppingList"></ul>
+                            </div>
+                        </div>
+                        <div class="recipe-info">
+                            <div class="recipe-detail">
+                                <h4>所需食材</h4>
+                                <ul id="recipeIngredients"></ul>
+                            </div>
+                            <div class="recipe-detail">
+                                <h4>烹飪步驟</h4>
+                                <ol id="recipeSteps"></ol>
+                            </div>
+                            <div class="recipe-stats">
+                                <div class="stat">
+                                    <span class="stat-label">預算</span>
+                                    <span id="recipeBudget" class="stat-value">--</span>
+                                </div>
+                                <div class="stat">
+                                    <span class="stat-label">熱量</span>
+                                    <span id="recipeCalories" class="stat-value">--</span>
+                                </div>
+                                <div class="stat">
+                                    <span class="stat-label">難度</span>
+                                    <span id="recipeDifficulty" class="stat-value">--</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div id="cocktailContent" class="tab-content">
+                    <div class="cocktail-card">
+                        <h2 id="cocktailName">尚未生成便利商店調酒</h2>
+                        <div class="cocktail-info">
+                            <div class="cocktail-detail">
+                                <h4>材料（便利商店可購買）</h4>
+                                <ul id="cocktailIngredients"></ul>
+                            </div>
+                            <div class="cocktail-detail">
+                                <h4>製作方法</h4>
+                                <ol id="cocktailSteps"></ol>
+                            </div>
+                            <div class="cocktail-stats">
+                                <div class="stat">
+                                    <span class="stat-label">風格</span>
+                                    <span id="cocktailStyle" class="stat-value">--</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+        </main>
+
+        <footer>
+            <p>AI 智慧語音互動食譜與創意調酒系統 | &copy; 2025</p>
+        </footer>
+    </div>
+
+    <!-- 引入 Google Generative AI SDK - 使用本地 UMD 版本 -->
+    <script src="js/index.umd.js"></script>
+    
+    <!-- 內嵌版 SDK (作為備用) -->
+    <script src="js/gemini-sdk-embedded.js"></script>
+    
+    <!-- 主要 JavaScript 檔案 -->
+    <script src="js/input-handler.js"></script>
+    <script src="js/gemini-service.js"></script>
+    <script src="js/arduino-service.js"></script>
+    <script src="js/recipe-generator.js"></script>
+    <script src="js/cocktail-generator-clean.js"></script>
+    <script src="js/main.js"></script>
+    
+    <!-- 確保手動輸入功能與 API Key 正常初始化 -->
+    <script>
+        // 確保手動輸入處理器和 API Key 在頁面加載時正確初始化
+        document.addEventListener('DOMContentLoaded', () => {
+            // 檢查手動輸入處理器是否正確初始化
+            if (!window.speechRecognitionInstance) {
+                console.log('初始化手動輸入處理器...');
+                window.speechRecognitionInstance = new ManualInputHandler();
+            }
+            
+            // 顯示已初始化訊息，方便確認
+            console.log('✏️ 手動輸入處理器初始化完成');
+            
+            // 檢查是否已有 API Key 並更新狀態顯示
+            const savedApiKey = localStorage.getItem('googleApiKey');
+            const apiKeyStatus = document.getElementById('apiKeyStatus');
+            
+            if (savedApiKey && apiKeyStatus) {
+                console.log('檢測到已保存的 API Key');
+                apiKeyStatus.innerHTML = '<i class="fas fa-check-circle"></i> 已連接';
+                apiKeyStatus.classList.add('connected');
+                apiKeyStatus.style.backgroundColor = '#e8f5e9';
+                apiKeyStatus.style.color = '#2e7d32';
+                apiKeyStatus.style.border = '1px solid #2e7d32';
+                
+                // 更新設定按鈕
+                const setApiKeyBtn = document.getElementById('setApiKeyBtn');
+                if (setApiKeyBtn) {
+                    setApiKeyBtn.innerHTML = '<i class="fas fa-edit"></i> 重新設定 API Key';
+                    setApiKeyBtn.style.backgroundColor = '#4CAF50';
+                }
+            }
+            
+            // 手動觸發模態框的功能（測試用）
+            window.showApiKeyModal = function() {
+                console.log('手動觸發 API Key 模態框');
+                promptForApiKey().then(apiKey => {
+                    console.log('獲取到 API Key:', apiKey ? '已填寫' : '未填寫');
+                    if (apiKey) {
+                        alert('您輸入的 API Key: ' + (apiKey === 'MOCK_API_KEY_FOR_DEMO' ? '使用模擬數據' : apiKey.substring(0, 10) + '...'));
+                    } else {
+                        alert('用戶取消或未輸入 API Key');
+                    }
+                });
+            };
+            
+            // 創建增強版診斷按鈕，協助排查 API 問題
+            const diagBtn = document.createElement('button');
+            diagBtn.id = 'diagApiBtn';
+            diagBtn.innerHTML = '🔍 診斷 API 問題';
+            diagBtn.style = 'position: fixed; bottom: 10px; left: 10px; z-index: 9999; background: linear-gradient(to right, #e3f2fd, #bbdefb); border: 1px solid #1976D2; padding: 8px 15px; border-radius: 20px; font-size: 14px; opacity: 0.9; font-weight: bold; color: #0d47a1; box-shadow: 0 3px 8px rgba(0,0,0,0.2); transition: all 0.3s ease; display: flex; align-items: center; gap: 5px;';
+            
+            // 添加脈動效果，使按鈕更容易被注意到
+            let pulseAnimation = false;
+            if (!window.geminiServiceInstance?.isInitialized()) {
+                // 如果 API 未正確初始化，添加脈動效果
+                pulseAnimation = true;
+                diagBtn.style.animation = 'pulse 2s infinite';
+                
+                // 添加 CSS 動畫
+                const style = document.createElement('style');
+                style.textContent = `
+                    @keyframes pulse {
+                        0% { box-shadow: 0 0 0 0 rgba(33, 150, 243, 0.7); }
+                        70% { box-shadow: 0 0 0 10px rgba(33, 150, 243, 0); }
+                        100% { box-shadow: 0 0 0 0 rgba(33, 150, 243, 0); }
+                    }
+                `;
+                document.head.appendChild(style);
+            }
+            
+            // 懸停效果
+            diagBtn.onmouseenter = function() {
+                this.style.transform = 'scale(1.05)';
+                this.style.boxShadow = '0 5px 12px rgba(0,0,0,0.25)';
+            };
+            
+            diagBtn.onmouseleave = function() {
+                this.style.transform = 'scale(1)';
+                this.style.boxShadow = '0 3px 8px rgba(0,0,0,0.2)';
+            };
+            
+            // 點擊效果啟動進階診斷
+            diagBtn.onclick = async function() {
+                // 顯示載入指示器
+                this.innerHTML = '⏳ 診斷中...';
+                this.style.pointerEvents = 'none'; // 防止重複點擊
+                
+                try {
+                    // 異步執行診斷
+                    await diagnosisApiIssue();
+                    
+                    // 診斷完成後恢復按鈕
+                    this.innerHTML = '🔍 診斷 API 問題';
+                    this.style.pointerEvents = 'auto';
+                } catch (err) {
+                    console.error('診斷過程發生錯誤:', err);
+                    this.innerHTML = '🔍 診斷 API 問題';
+                    this.style.pointerEvents = 'auto';
+                    alert('診斷過程發生錯誤: ' + err.message);
+                }
+            };
+            
+            document.body.appendChild(diagBtn);
+            
+            // 系統診斷按鈕 - 可診斷更廣泛的問題
+            const diagBtnStyle = 'position: fixed; z-index: 9999; background: linear-gradient(to right, #e3f2fd, #bbdefb); border: 1px solid #1976D2; padding: 8px 15px; border-radius: 20px; font-size: 14px; opacity: 0.9; font-weight: bold; color: #0d47a1; box-shadow: 0 3px 8px rgba(0,0,0,0.2); transition: all 0.3s ease; display: flex; align-items: center; gap: 5px;';
+            
+            const diagSystemBtn = document.createElement('button');
+            diagSystemBtn.id = 'diagSystemBtn';
+            diagSystemBtn.innerHTML = '🛠️ 系統診斷';
+            diagSystemBtn.style = diagBtnStyle + 'bottom: 10px; left: 165px; background: linear-gradient(to right, #fff0c7, #ffe082);';
+            
+            diagSystemBtn.onmouseenter = function() {
+                this.style.transform = 'scale(1.05)';
+                this.style.boxShadow = '0 5px 12px rgba(0,0,0,0.25)';
+            };
+            
+            diagSystemBtn.onmouseleave = function() {
+                this.style.transform = 'scale(1)';
+                this.style.boxShadow = '0 3px 8px rgba(0,0,0,0.2)';
+            };
+            
+            diagSystemBtn.onclick = function() {
+                this.innerHTML = '⏳ 診斷中...';
+                this.style.pointerEvents = 'none';
+                
+                try {
+                    // 調用全局診斷函數
+                    window.diagnoseSystem();
+                    
+                    this.innerHTML = '🛠️ 系統診斷';
+                    this.style.pointerEvents = 'auto';
+                } catch (err) {
+                    console.error('系統診斷發生錯誤:', err);
+                    this.innerHTML = '🛠️ 系統診斷';
+                    this.style.pointerEvents = 'auto';
+                    alert('系統診斷發生錯誤: ' + err.message);
+                }
+            };
+            
+            document.body.appendChild(diagSystemBtn);
+            
+            // 如果有錯誤提示或超時，自動觸發一次診斷
+            if (pulseAnimation) {
+                // 延遲一點時間再執行，讓頁面先載入完畢
+                setTimeout(() => {
+                    console.log('檢測到 API 狀態異常，自動執行診斷...');
+                    // 確保 showNotification 函數已載入
+                    if (typeof showNotification === 'function') {
+                        showNotification('💡 系統偵測到 API 可能有問題，正在自動診斷...', 'info');
+                    }
+                    // 確保 diagnosisApiIssue 函數已載入
+                    if (typeof diagnosisApiIssue === 'function') {
+                        diagnosisApiIssue();
+                    }
+                }, 5000);
+            }
+            
+            // 添加一個模態框測試按鈕（便於測試）
+            const testModalBtn = document.createElement('button');
+            testModalBtn.id = 'testModalBtn';
+            testModalBtn.innerHTML = '🧪 測試 Google API Key 模態框';
+            testModalBtn.style = 'position: fixed; bottom: 60px; left: 10px; z-index: 9999; background: #FF9800; color: white; border: 1px solid #F57C00; padding: 8px 12px; border-radius: 4px; font-size: 12px; cursor: pointer; font-weight: bold; box-shadow: 0 2px 5px rgba(0,0,0,0.2);';
+            
+            testModalBtn.addEventListener('click', () => {
+                console.log('測試按鈕被點擊');
+                window.showApiKeyModal();
+            });
+            
+            document.body.appendChild(testModalBtn);
+        });
+        
+        // 添加內嵌調試工具
+        window.createDifficultyDebugger = function() {
+            const debugPanel = document.createElement('div');
+            debugPanel.id = 'difficultyDebugPanel';
+            debugPanel.style.cssText = `
+                position: fixed; 
+                top: 50px; 
+                right: 10px; 
+                width: 300px; 
+                background: white; 
+                border: 2px solid #007bff; 
+                border-radius: 8px; 
+                padding: 15px; 
+                box-shadow: 0 4px 12px rgba(0,0,0,0.15); 
+                z-index: 10000; 
+                font-family: Arial, sans-serif; 
+                font-size: 12px;
+                max-height: 400px;
+                overflow-y: auto;
+            `;
+            
+            debugPanel.innerHTML = `
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px;">
+                    <h4 style="margin: 0; color: #007bff;">🔧 難度同步調試</h4>
+                    <button onclick="document.getElementById('difficultyDebugPanel').remove()" style="background: #dc3545; color: white; border: none; border-radius: 3px; padding: 2px 6px; cursor: pointer;">✕</button>
+                </div>
+                <div id="debugStatus" style="margin-bottom: 10px; font-size: 11px;"></div>
+                <div style="margin-bottom: 10px;">
+                    <button onclick="window.testDifficultySync('easy')" style="background: #6c757d; color: white; border: none; padding: 4px 8px; margin: 2px; border-radius: 3px; cursor: pointer;">測試簡單</button>
+                    <button onclick="window.testDifficultySync('medium')" style="background: #ffc107; color: black; border: none; padding: 4px 8px; margin: 2px; border-radius: 3px; cursor: pointer;">測試中等</button>
+                    <button onclick="window.testDifficultySync('hard')" style="background: #dc3545; color: white; border: none; padding: 4px 8px; margin: 2px; border-radius: 3px; cursor: pointer;">測試困難</button>
+                </div>
+                <div style="margin-bottom: 10px;">
+                    <button onclick="window.updateDebugStatus()" style="background: #17a2b8; color: white; border: none; padding: 4px 8px; margin: 2px; border-radius: 3px; cursor: pointer;">刷新狀態</button>
+                    <button onclick="window.simulateArduino('medium')" style="background: #28a745; color: white; border: none; padding: 4px 8px; margin: 2px; border-radius: 3px; cursor: pointer;">模擬Arduino</button>
+                </div>
+                <div style="margin-bottom: 10px;">
+                    <h5 style="margin: 5px 0; font-size: 11px;">模擬Arduino指令:</h5>
+                    <button onclick="window.simulateArduinoCommand('DIFFICULTY:EASY')" style="background: #6c757d; color: white; border: none; padding: 3px 6px; margin: 1px; border-radius: 2px; cursor: pointer; font-size: 10px;">簡單</button>
+                    <button onclick="window.simulateArduinoCommand('DIFFICULTY:MEDIUM')" style="background: #ffc107; color: black; border: none; padding: 3px 6px; margin: 1px; border-radius: 2px; cursor: pointer; font-size: 10px;">中等</button>
+                    <button onclick="window.simulateArduinoCommand('DIFFICULTY:HARD')" style="background: #dc3545; color: white; border: none; padding: 3px 6px; margin: 1px; border-radius: 2px; cursor: pointer; font-size: 10px;">困難</button>
+                </div>
+                <div id="debugLog" style="background: #f8f9fa; padding: 8px; border-radius: 4px; font-family: monospace; font-size: 10px; max-height: 150px; overflow-y: auto;"></div>
+            `;
+            
+            document.body.appendChild(debugPanel);
+            window.updateDebugStatus();
+        };
+        
+        window.updateDebugStatus = function() {
+            const statusDiv = document.getElementById('debugStatus');
+            if (!statusDiv) return;
+            
+            try {
+                const hasRecipe = !!window.recipeGeneratorInstance;
+                const difficulty = hasRecipe ? window.recipeGeneratorInstance.difficultyLevel : '未知';
+                const hasArduino = !!window.arduinoServiceInstance;
+                const arduinoConnected = hasArduino ? window.arduinoServiceInstance.connected : false;
+                
+                // 檢查按鈕狀態
+                const easyActive = document.getElementById('easyBtn')?.classList.contains('active') || false;
+                const mediumActive = document.getElementById('mediumBtn')?.classList.contains('active') || false;
+                const hardActive = document.getElementById('hardBtn')?.classList.contains('active') || false;
+                
+                statusDiv.innerHTML = `
+                    <div><strong>狀態檢查:</strong></div>
+                    <div>🎯 當前難度: <span style="color: #007bff; font-weight: bold;">${difficulty}</span></div>
+                    <div>🔧 RecipeGenerator: ${hasRecipe ? '✅' : '❌'}</div>
+                    <div>🔌 Arduino: ${hasArduino ? (arduinoConnected ? '✅ 已連接' : '⚠️ 未連接') : '❌'}</div>
+                    <div>按鈕狀態: ${easyActive ? '🟢簡單' : '⚪簡單'} ${mediumActive ? '🟡中等' : '⚪中等'} ${hardActive ? '🔴困難' : '⚪困難'}</div>
+                `;
+            } catch (error) {
+                statusDiv.innerHTML = `<div style="color: red;">錯誤: ${error.message}</div>`;
+            }
+        };
+        
+        window.testDifficultySync = function(difficulty) {
+            const logDiv = document.getElementById('debugLog');
+            if (!logDiv) return;
+            
+            const timestamp = new Date().toLocaleTimeString();
+            
+            try {
+                logDiv.innerHTML += `[${timestamp}] 測試設置難度: ${difficulty}\n`;
+                
+                if (!window.recipeGeneratorInstance) {
+                    throw new Error('RecipeGenerator 實例不存在');
+                }
+                
+                const beforeDifficulty = window.recipeGeneratorInstance.difficultyLevel;
+                window.recipeGeneratorInstance.setDifficulty(difficulty);
+                const afterDifficulty = window.recipeGeneratorInstance.difficultyLevel;
+                
+                logDiv.innerHTML += `[${timestamp}] 難度變更: ${beforeDifficulty} → ${afterDifficulty}\n`;
+                
+                // 檢查按鈕狀態
+                const btn = document.getElementById(difficulty + 'Btn');
+                const isActive = btn ? btn.classList.contains('active') : false;
+                logDiv.innerHTML += `[${timestamp}] 按鈕${difficulty}是否活動: ${isActive}\n`;
+                
+                const success = afterDifficulty === difficulty && isActive;
+                logDiv.innerHTML += `[${timestamp}] 結果: ${success ? '✅ 成功' : '❌ 失敗'}\n\n`;
+                
+                logDiv.scrollTop = logDiv.scrollHeight;
+                window.updateDebugStatus();
+                
+            } catch (error) {
+                logDiv.innerHTML += `[${timestamp}] ❌ 錯誤: ${error.message}\n\n`;
+                logDiv.scrollTop = logDiv.scrollHeight;
+            }
+        };
+        
+        window.simulateArduino = function(difficulty) {
+            const logDiv = document.getElementById('debugLog');
+            if (!logDiv) return;
+            
+            const timestamp = new Date().toLocaleTimeString();
+            
+            try {
+                logDiv.innerHTML += `[${timestamp}] 模擬Arduino發送: DIFFICULTY:${difficulty}\n`;
+                
+                if (!window.arduinoServiceInstance) {
+                    throw new Error('Arduino 服務實例不存在');
+                }
+                
+                // 直接調用同步方法
+                window.arduinoServiceInstance.syncWebDifficulty(difficulty);
+                
+                logDiv.innerHTML += `[${timestamp}] Arduino同步完成\n\n`;
+                logDiv.scrollTop = logDiv.scrollHeight;
+                
+                setTimeout(() => {
+                    window.updateDebugStatus();
+                }, 100);
+                
+            } catch (error) {
+                logDiv.innerHTML += `[${timestamp}] ❌ Arduino模擬錯誤: ${error.message}\n\n`;
+                logDiv.scrollTop = logDiv.scrollHeight;
+            }
+        };
+        
+        // 模擬完整的Arduino指令處理流程
+        window.simulateArduinoCommand = function(command) {
+            const logDiv = document.getElementById('debugLog');
+            if (!logDiv) return;
+            
+            const timestamp = new Date().toLocaleTimeString();
+            
+            try {
+                logDiv.innerHTML += `[${timestamp}] 完整模擬Arduino指令: ${command}\n`;
+                
+                if (!window.arduinoServiceInstance) {
+                    throw new Error('Arduino 服務實例不存在');
+                }
+                
+                // 模擬 Arduino 發送完整的數據包
+                window.arduinoServiceInstance.handleReceivedData(command + '\n');
+                
+                logDiv.innerHTML += `[${timestamp}] 指令處理完成\n\n`;
+                logDiv.scrollTop = logDiv.scrollHeight;
+                
+                setTimeout(() => {
+                    window.updateDebugStatus();
+                }, 100);
+                
+            } catch (error) {
+                logDiv.innerHTML += `[${timestamp}] ❌ 指令模擬錯誤: ${error.message}\n\n`;
+                logDiv.scrollTop = logDiv.scrollHeight;
+            }
+        };
+    </script>
+</body>
+</html>
